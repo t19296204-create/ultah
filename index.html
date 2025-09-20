@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Undangan Interaktif</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --orchid: #DA70D6;
+            --mint-green: #98FB98;
+            --dark-gray: #333;
+            --medium-gray: #555;
+            --light-gray: #eee;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, var(--orchid), var(--mint-green));
+            font-family: 'Poppins', sans-serif;
+            overflow: hidden;
+            transition: transform 1s ease-in-out, opacity 1s ease-in-out;
+            color: #fff;
+        }
+
+        .container {
+            text-align: center;
+            position: relative;
+            z-index: 2;
+            transition: opacity 0.5s ease-out;
+        }
+
+        .cassette-player-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-top: 30px;
+            position: relative;
+            z-index: 3;
+            perspective: 1000px;
+            cursor: pointer; /* Menjadikan seluruh area dapat diklik */
+        }
+
+        .cassette-box {
+            width: 250px;
+            height: 120px;
+            background-color: var(--dark-gray);
+            border-radius: 10px;
+            position: relative;
+            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4);
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 15px;
+        }
+
+        .cassette-half {
+            position: absolute;
+            left: -80px;
+            width: 150px;
+            height: 100px;
+            background: linear-gradient(to right, #444, #666);
+            border-radius: 8px;
+            box-shadow: 3px 0 15px rgba(0, 0, 0, 0.5);
+            transition: transform 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            transform-origin: right center;
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            padding: 10px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            box-sizing: border-box;
+        }
+
+        .cassette-half::before, .cassette-half::after {
+            content: '';
+            width: 30px;
+            height: 30px;
+            border: 3px solid #333;
+            border-radius: 50%;
+            background-color: #222;
+            box-shadow: inset 0 0 5px rgba(0, 0, 0, 0.5);
+        }
+
+        .control-buttons {
+            display: flex;
+            gap: 15px;
+            z-index: 5;
+            position: relative; /* Pastikan tombol di atas kaset */
+        }
+
+        .control-button {
+            background-color: var(--light-gray);
+            border: none;
+            border-radius: 50%;
+            width: 50px;
+            height: 50px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.3);
+            transition: background-color 0.2s ease, transform 0.2s ease;
+        }
+
+        .control-button:hover {
+            background-color: #fff;
+            transform: translateY(-2px);
+        }
+
+        .control-button img {
+            width: 25px;
+            height: 25px;
+        }
+
+        .glass-effect {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 250px;
+            height: 250px;
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(8px);
+            border-radius: 50%;
+            z-index: 0;
+            transition: transform 1s ease, opacity 1s ease;
+        }
+
+        .content {
+            display: none;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 85%;
+            max-width: 550px;
+            background: rgba(255, 255, 255, 0.2);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+            border-radius: 20px;
+            padding: 40px;
+            text-align: center;
+            color: var(--dark-gray);
+            box-shadow: 0 10px 40px 0 rgba(0, 0, 0, 0.2);
+            animation: fadeIn 1s ease-in-out forwards;
+        }
+        
+        .content h2, .content h3, .content p {
+            color: var(--dark-gray);
+        }
+
+        .back-button {
+            background: rgba(255, 255, 255, 0.3);
+            backdrop-filter: blur(8px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            border-radius: 10px;
+            padding: 10px 20px;
+            margin-top: 30px;
+            cursor: pointer;
+            color: var(--dark-gray);
+            font-weight: 600;
+            text-decoration: none;
+            display: inline-block;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .back-button:hover {
+            background-color: rgba(255, 255, 255, 0.5);
+            transform: translateY(-2px);
+        }
+
+        .body-zoomed {
+            transform: scale(0.5) !important;
+            opacity: 0;
+        }
+        .body-reset {
+            transform: scale(1) !important;
+            opacity: 1;
+        }
+
+        .cassette-half-entering {
+            transform: translateX(100px);
+        }
+        .cassette-half-reset {
+            transform: translateX(0px);
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translate(-50%, -50%) scale(0.9); }
+            to { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <audio id="background-music" loop>
+        <source src="Jamrud - Selamat Ulang Tahun (Official Lyric Video).mp3" type="audio/mpeg">
+        Browser Anda tidak mendukung elemen audio.
+    </audio>
+
+    <div class="glass-effect" id="glass-effect"></div>
+
+    <div class="container" id="main-container">
+        <h1>UNDANGAN</h1>
+        <p>Ketuk kaset untuk melihat detailnya.</p>
+        <div class="cassette-player-container" id="cassette-entry-button">
+            <div class="cassette-box">
+                <div class="cassette-half"></div>
+                <div class="control-buttons">
+                    <button class="control-button" id="play-button">
+                        <img src="play-button.png" alt="Play">
+                    </button>
+                    <button class="control-button" id="pause-button" style="display:none;">
+                        <img src="video-pause-button.png" alt="Pause">
+        
+                      
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="content" id="undangan-content">
+        <h2>Undangan</h2>
+        <p>Dengan sukacita kami mengundang Bapak & Ibu untuk merayakan ulang tahun dan purnabakti.</p>
+        <h3>Muliati.S.Kuheba S.Pd</h3>
+        <p>Senin, 22 September 2025</p>
+        <p>Pukul 12.00 WITA</p>
+        <p>Bertempat di Kelurahan Sindulang dua Lingkungan dua Lorong Lumba - Lumba Kecamatan Tuminting , Manado</p>
+        <button class="back-button" id="back-to-main">Kembali</button>
+    </div>
+
+    <script>
+        const music = document.getElementById('background-music');
+        const playButton = document.getElementById('play-button');
+        const pauseButton = document.getElementById('pause-button');
+        const cassetteEntryButton = document.getElementById('cassette-entry-button');
+        const cassetteHalf = document.querySelector('.cassette-half');
+        const mainContainer = document.getElementById('main-container');
+        const glassEffect = document.getElementById('glass-effect');
+        const undanganContent = document.getElementById('undangan-content');
+        const backButton = document.getElementById('back-to-main');
+
+        // Fungsi untuk mengelola pemutaran musik
+        function handleMusic() {
+            if (music.paused) {
+                music.muted = false;
+                music.play().catch(error => console.log("Musik gagal diputar. Interaksi pengguna diperlukan.", error));
+            } else {
+                music.pause();
+            }
+        }
+
+        // Tampilan play/pause button berdasarkan status musik
+        music.addEventListener('play', () => {
+            playButton.style.display = 'none';
+            pauseButton.style.display = 'flex';
+        });
+
+        music.addEventListener('pause', () => {
+            playButton.style.display = 'flex';
+            pauseButton.style.display = 'none';
+        });
+
+        // Event listener untuk tombol play dan pause
+        playButton.addEventListener('click', function(event) {
+            event.stopPropagation(); // Mencegah klik di dalam tombol memicu event lain
+            music.muted = false;
+            music.play();
+        });
+
+        pauseButton.addEventListener('click', function(event) {
+            event.stopPropagation(); // Mencegah klik di dalam tombol memicu event lain
+            music.pause();
+        });
+
+        // Event listener utama untuk masuk ke undangan (seluruh area kaset)
+        cassetteEntryButton.addEventListener('click', function() {
+            // Putar musik saat masuk
+            if (music.paused) {
+                 music.muted = false;
+                 music.play();
+            }
+
+            // Animasi kaset masuk ke dalam kotak
+            cassetteHalf.style.transform = 'translateX(100px)';
+
+            // Animasi body mengecil dan transparan
+            document.body.classList.add('body-zoomed');
+
+            // Sembunyikan elemen utama setelah animasi selesai
+            setTimeout(function() {
+                mainContainer.style.display = 'none';
+                glassEffect.style.transform = 'translate(-50%, -50%) scale(0)';
+            }, 600); // Waktu sesuai durasi transisi CSS
+
+            // Tampilkan konten undangan
+            setTimeout(function() {
+                undanganContent.style.display = 'block';
+                document.body.classList.remove('body-zoomed');
+                document.body.style.opacity = '1';
+            }, 800);
+        });
+
+        // Event listener untuk tombol kembali
+        backButton.addEventListener('click', function() {
+            // Sembunyikan konten undangan
+            undanganContent.style.display = 'none';
+
+            // Reset posisi kaset dan tampilkan elemen utama
+            cassetteHalf.style.transform = 'translateX(0px)';
+            mainContainer.style.display = 'block';
+            mainContainer.style.opacity = '1';
+            glassEffect.style.transform = 'translate(-50%, -50%) scale(1)';
+        });
+    </script>
+
+</body>
+</html>
